@@ -1,9 +1,10 @@
 from PIL import Image
 from PIL.ImageFile import ImageFile
 import os
-from fpdf import FPDF
 from typing import List, Tuple
 import pathlib
+
+from coloring_book import ColoringBook
 
 
 LUMINOSITY_THRESHOLD = 75
@@ -40,53 +41,6 @@ def get_save_coloring_image_pairs(
     return image_pair_files
 
 
-def create_coloring_book(
-    image_pairs: List[Tuple[str]],
-    dim_hor: int = 297,
-    dim_ver: int = 210,
-    margin: int = 25,
-) -> FPDF:
-    pdf = FPDF(orientation="landscape", unit="mm", format="A4")
-    center_pos_img_color = (dim_hor / 2 - dim_hor / 4, dim_ver / 2)
-    center_pos_img_bw = (dim_hor / 2 + dim_hor / 4, dim_ver / 2)
-
-    image_space = (dim_hor / 2 - margin, dim_ver - margin)
-
-    for img_col_file, img_bw_file in image_pairs:
-        pdf.add_page()
-        add_image_in_centered_position(
-            pdf, Image.open(img_col_file), image_space, center_pos_img_color
-        )
-        add_image_in_centered_position(
-            pdf, Image.open(img_bw_file), image_space, center_pos_img_bw
-        )
-
-    return pdf
-
-
-def dimensions_image_to_space(img: ImageFile, hdim: int, vdim: int) -> dict:
-    h, v = img.size
-    img_ratio = h / v
-    space_ratio = hdim / vdim
-
-    # either horizontal or vertical is limitant
-    if img_ratio > space_ratio:
-        return dict(w=hdim, h=hdim / img_ratio)
-    return dict(h=vdim, w=vdim * img_ratio)
-
-
-def add_image_in_centered_position(
-    pdf: FPDF, img: Image, space: Tuple[int], center_pos: Tuple[int]
-):
-    dims = dimensions_image_to_space(img, *space)
-    pos_img = get_pos_from_center_pos_and_dimensions(*center_pos, **dims)
-    pdf.image(img, *pos_img, **dims)
-
-
-def get_pos_from_center_pos_and_dimensions(xpos, ypos, w, h) -> Tuple[int]:
-    return (xpos - w / 2, ypos - h / 2)
-
-
 input_dir = "images/color"
 
 img_filenames = filenames_in_directory(input_dir)
@@ -95,6 +49,6 @@ image_file_pairs = get_save_coloring_image_pairs(
     input_dir, img_filenames, LUMINOSITY_THRESHOLD, "images/grayscale"
 )
 
-pdf_coloring_book = create_coloring_book(image_file_pairs)
+pdf_coloring_book = ColoringBook.create_coloring_book(image_file_pairs)
 
 pdf_coloring_book.output("coloring_book.pdf")
