@@ -3,10 +3,12 @@ from PIL.ImageFile import ImageFile
 import os
 from typing import List, Tuple
 import pathlib
+import json
 
 from coloring_book import NamedColoringBook
 
 
+COLORING_BOOK_CONTENT_FILE = "coloring_book_contents.json"
 LUMINOSITY_THRESHOLD = 75
 
 
@@ -15,7 +17,7 @@ def image_file_pairs_from_directory(input_dir: str):
         input_dir,
         filenames_in_directory(input_dir),
         LUMINOSITY_THRESHOLD,
-        f"{input_dir}_grayscale",
+        f"grayscale/{input_dir}_grayscale",
     )
 
 
@@ -50,19 +52,30 @@ def get_save_coloring_image_pairs(
     return image_pair_files
 
 
-car_pair_images = image_file_pairs_from_directory("images/cars")
-plane_pair_images = image_file_pairs_from_directory("images/planes")
-train_pair_images = image_file_pairs_from_directory("images/trains")
+def load_pages_as_defined_in_content_file(input_dir: str, content_file: str) -> list:
 
-blank_pages = [None] * 15
-pages = (
-    car_pair_images
-    + blank_pages
-    + plane_pair_images
-    + blank_pages
-    + train_pair_images
-    + blank_pages
-)
+    with open(content_file, "rb") as fp:
+        book_contents = json.load(fp)
+
+    pages = []
+    for keyword, value in book_contents:
+        if keyword == "coloring":
+            new_pages = image_file_pairs_from_directory(f"{input_dir}/{value}")
+        elif keyword == "image":
+            new_pages = [
+                f"{input_dir}/{value}/{v}"
+                for v in filenames_in_directory(f"{input_dir}/{value}")
+            ]
+        elif keyword == "blank":
+            new_pages = [None] * int(value)
+        else:
+            ValueError(f"Invalid keyword: {keyword}")
+        pages += new_pages
+
+    return pages
+
+
+pages = load_pages_as_defined_in_content_file("images", COLORING_BOOK_CONTENT_FILE)
 
 pdf_coloring_book = NamedColoringBook.create_coloring_book(pages, name="Peter Jackson")
 

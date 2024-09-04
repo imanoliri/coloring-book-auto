@@ -43,6 +43,15 @@ class ColoringBook(FPDF):
             if content is None:  # blank page!
                 continue
 
+            if len(content) == 1 or isinstance(content, str):  # single image
+                self.add_image_in_centered_position(
+                    Image.open(content),
+                    (self.dim_hor - self.margin, self.dim_ver - self.margin),
+                    (self.dim_hor / 2, self.dim_ver / 2),
+                )
+                continue
+
+            # Pair of images left and right
             img_col_file, img_bw_file = content
             self.add_image_in_centered_position(
                 Image.open(img_col_file),
