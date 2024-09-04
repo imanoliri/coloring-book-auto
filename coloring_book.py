@@ -37,8 +37,13 @@ class ColoringBook(FPDF):
         self,
         image_pairs: List[Tuple[str]],
     ) -> FPDF:
-        for img_col_file, img_bw_file in image_pairs:
+
+        for content in image_pairs:
             self.add_page()
+            if content is None:  # blank page!
+                continue
+
+            img_col_file, img_bw_file = content
             self.add_image_in_centered_position(
                 Image.open(img_col_file),
                 self.image_space,

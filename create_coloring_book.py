@@ -10,6 +10,15 @@ from coloring_book import NamedColoringBook
 LUMINOSITY_THRESHOLD = 75
 
 
+def image_file_pairs_from_directory(input_dir: str):
+    return get_save_coloring_image_pairs(
+        input_dir,
+        filenames_in_directory(input_dir),
+        LUMINOSITY_THRESHOLD,
+        f"{input_dir}_grayscale",
+    )
+
+
 def filenames_in_directory(directory: str) -> list:
     return [
         f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))
@@ -41,16 +50,20 @@ def get_save_coloring_image_pairs(
     return image_pair_files
 
 
-input_dir = "images/color"
+car_pair_images = image_file_pairs_from_directory("images/cars")
+plane_pair_images = image_file_pairs_from_directory("images/planes")
+train_pair_images = image_file_pairs_from_directory("images/trains")
 
-img_filenames = filenames_in_directory(input_dir)
-
-image_file_pairs = get_save_coloring_image_pairs(
-    input_dir, img_filenames, LUMINOSITY_THRESHOLD, "images/grayscale"
+blank_pages = [None] * 15
+pages = (
+    car_pair_images
+    + blank_pages
+    + plane_pair_images
+    + blank_pages
+    + train_pair_images
+    + blank_pages
 )
 
-pdf_coloring_book = NamedColoringBook.create_coloring_book(
-    image_file_pairs, name="Peter Jackson"
-)
+pdf_coloring_book = NamedColoringBook.create_coloring_book(pages, name="Peter Jackson")
 
 pdf_coloring_book.output("coloring_book.pdf")
