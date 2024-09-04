@@ -73,3 +73,19 @@ class ColoringBook(FPDF):
     @staticmethod
     def get_pos_from_center_pos_and_dimensions(xpos, ypos, w, h) -> Tuple[int]:
         return (xpos - w / 2, ypos - h / 2)
+
+
+class NamedColoringBook(ColoringBook):
+    def __init__(self, *args, name: str, **kwargs) -> ColoringBook:
+        self.name = name
+        super().__init__(*args, **kwargs)
+
+    def header(self):
+
+        self.set_font("Times", "BI", 15)
+        # Move to the right & write cell
+        self.cell(self.dim_hor - 80)
+        self.cell(30, 10, self.name)
+
+        # Line break
+        self.ln(20)

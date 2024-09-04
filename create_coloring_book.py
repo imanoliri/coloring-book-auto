@@ -4,7 +4,7 @@ import os
 from typing import List, Tuple
 import pathlib
 
-from coloring_book import ColoringBook
+from coloring_book import NamedColoringBook
 
 
 LUMINOSITY_THRESHOLD = 75
@@ -49,6 +49,8 @@ image_file_pairs = get_save_coloring_image_pairs(
     input_dir, img_filenames, LUMINOSITY_THRESHOLD, "images/grayscale"
 )
 
-pdf_coloring_book = ColoringBook.create_coloring_book(image_file_pairs)
+pdf_coloring_book = NamedColoringBook.create_coloring_book(
+    image_file_pairs, name="Peter Jackson"
+)
 
 pdf_coloring_book.output("coloring_book.pdf")
