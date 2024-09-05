@@ -16,6 +16,7 @@ def image_file_pairs_from_directory(input_dir: str, luminosity_threshold: int):
 
 
 def filenames_in_directory(directory: str) -> list:
+    pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
     return [
         f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))
     ]
