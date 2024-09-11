@@ -90,9 +90,9 @@ class ColoringBook(FPDF):
 
 
 class NamedColoringBook(ColoringBook):
-    def __init__(self, *args, name: str, **kwargs) -> ColoringBook:
+    def __init__(self, *args, name: str, margin: int = 35, **kwargs) -> ColoringBook:
         self.name = name
-        super().__init__(*args, **kwargs)
+        super().__init__(*args, margin=margin, **kwargs)
 
     def header(self):
 
